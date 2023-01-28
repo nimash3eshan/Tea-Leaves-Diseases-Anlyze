@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Tea Leaves Disease Prediction</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Tea Leaves Disease Prediction</h1>
+      <div class="uploaded-image">
+        <img id="uploaded-image" src="#" alt="Uploaded Image" />
+      </div>
+      <form
+        action="{{ url_for('predict') }}"
+        method="post"
+        enctype="multipart/form-data"
+      >
+        <div class="form-group">
+          <label for="file">Upload an image of a tea leaf:</label>
+          <input type="file" id="file" name="file" />
+        </div>
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary">Predict</button>
+          <div class="prediction" id="prediction">Prediction Result</div>
+        </div>
+      </form>
+    </div>
+    <script>
+      var fileInput = document.getElementById("file");
+      var uploadedImage = document.getElementById("uploaded-image");
+      var predictionDiv = document.getElementById("prediction");
+
+      fileInput.onchange = function () {
+        var file = fileInput.files[0];
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          uploadedImage.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      };
+
+      // Add an event listener to the form
+      document.querySelector("form").addEventListener("submit", function (e) {
+        e.preventDefault(); // prevent the form from submitting
+
+        var formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+
+        // Make an AJAX call to the '/predict' endpoint
+        fetch("/predict", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((prediction) => {
+            predictionDiv.innerHTML = prediction.result;
+          });
+      });
+    </script>
+  </body>
+</html>
